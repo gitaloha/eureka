@@ -5,6 +5,8 @@
  *联系：zeng_xiax@163.com
  *时间：2013-8-4 21:49:37
  */
+#ifndef __PCAP_H__
+#define __PCAP_H__
 
 #include <stdio.h>
 #include "type.h"
@@ -28,21 +30,22 @@ typedef struct pcap_file_header{
 /**
  *pcap文件的数据包头格式
  */
-typedef struct pcap_packet_header{
-	TIMESTAMP time;
-	uint pcaplen; //抓到的包的长度
-	uint len;//实际包的长度
-}PCAP_PACKET_HEADER;
 typedef struct timestamp
 {
 	uint sec;
 	uint microsec;
 }TIMESTAMP;
+typedef struct pcap_packet_header{
+	TIMESTAMP time;
+	uint pcaplen; //抓到的包的长度
+	uint len;//实际包的长度
+}PCAP_PACKET_HEADER;
 
 /**
  *
  */
 #define MACADDR_LEN 6
+#define MACHEAD_LEN 14
 #define TYPE_IP 0x0800
 typedef struct mac_header
 {
@@ -57,6 +60,11 @@ typedef struct mac_header
 #define PACKET_IN 1
 #define PACKET_OUT 2
 #define PACKET_LOCAL 3
+#define MIN_IP_HEAD_LEN 20
+#define IP_DATALEN_OFFSET 2
+#define IP_SLICE_OFFSET 2
+#define IP_PROTOCAL_OFFSET 1
+#define IP_SRCIP_OFFSET 2
 typedef struct ip_packet{
 	TIMESTAMP time;
 	short direct;
@@ -67,5 +75,14 @@ typedef struct ip_packet{
 	uchar dest_ip[IPADDR_BYTES];
 	struct ip_packet *next;
 }IP_PACKET;
+typedef struct ip_packet_list{
+	IP_PACKET *pHead;
+	IP_PACKET **pptail;
+}IP_PACKET_LIST;
 
-int parseCapFile(IN char *pFilename, OUT IP_PACKET **pPackets);
+int parseCapFile(IN char *pFilename, OUT IP_PACKET_LIST *pPackets);
+void releasePackets(IP_PACKET_LIST *packList);
+
+void testPackList(IP_PACKET_LIST packList);
+void testHton();
+#endif
