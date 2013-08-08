@@ -54,27 +54,59 @@ typedef struct mac_header
 	ushort type;
 }MAC_HEADER;
 /**
- *分析需要的IP元数据信息
+ *收集需要的TCP包头数据
  */
+#define TCP_MIN_LEN 14
+#define TCP_FIRST_FLAG 0x02
+#define TCP_SECOND_FLAG 0x12
+#define TCP_THIRD_FLAG 0x10
+#define IS_FIRST_HANDING(flag)  (uchar)flag & TCP_FIRST_FLAG
+#define IS_SECOND_HANDING(flag) (uchar)flag & TCP_SECOND_FLAG
+#define IS_THIRD_HANDING(flag) (uchar)flag & TCP_THIRD_FLAG
+#define TCP_FLAG_OFFSET 1
+typedef struct tcp_packet{
+	ushort src_port;
+	ushort dest_port;
+	uint seq_num;
+	uint ack_num;
+	uchar flag;
+}TCP_PACKET;
+/**
+ *收集需要的IP数据信息
+ */
+#define IPv4 0X40
+#define IPv6 0x60
 #define IPADDR_BYTES 4
+#define IPADDRv6_BYTES 16
 #define PACKET_IN 1
 #define PACKET_OUT 2
 #define PACKET_LOCAL 3
 #define MIN_IP_HEAD_LEN 20
-#define IP_DATALEN_OFFSET 2
+#define MIN_IPv6_HEAD_LEN 40
+#define IP_DATALEN_OFFSET 1
 #define IP_SLICE_OFFSET 2
 #define IP_PROTOCAL_OFFSET 1
 #define IP_SRCIP_OFFSET 2
+#define IPv6_DATALEN_OFFSET 3
+#define IPv6_SRC_OFFSET 1
+#define IP_TYPE_TCP 6
+typedef union ip_addr{
+	uchar ip4[IPADDR_BYTES];
+	ushort ip6[IPADDRv6_BYTES/2];
+}IP_ADDR;
 typedef struct ip_packet{
 	TIMESTAMP time;
 	short direct;
 	ushort ip_len;
 	ushort offset;
 	ushort type;
-	uchar src_ip[IPADDR_BYTES];
-	uchar dest_ip[IPADDR_BYTES];
+	uchar ip_version;
+	IP_ADDR src_ip;
+	IP_ADDR dest_ip;
 	struct ip_packet *next;
+	TCP_PACKET *pTcpPacket;
 }IP_PACKET;
+
 typedef struct ip_packet_list{
 	IP_PACKET *pHead;
 	IP_PACKET **pptail;

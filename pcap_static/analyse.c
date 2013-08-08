@@ -47,6 +47,7 @@ int statTotalFlow(IN IP_PACKET_LIST *pIpList, OUT TOTAL_FLOW_LIST *pTotalList)
 
 	while(pPacket != *pIpList->pptail)
 	{
+		//printf("%X\r\n", (unsigned)pPacket);
 		//单位是秒，同一秒内的数据合并在一起
 		if(pOnePacket->time == pPacket->time.sec){
 			pOnePacket->bytes += pPacket->ip_len;
@@ -111,7 +112,7 @@ void testTotalFlow(IN TOTAL_FLOW_LIST *pTotalList){
 	while(pTotal != *pTotalList->ppTail)
 	{
 		fprintf(pOut, "%d\t%lu\r\n", pTotal->time, pTotal->bytes);
-		printf("%d\t%lu\r\n", pTotal->time, pTotal->bytes);
+		//printf("%d\t%lu\r\n", pTotal->time, pTotal->bytes);
 		pTotal = pTotal->next;
 	}
 }
